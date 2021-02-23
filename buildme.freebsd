@@ -1,0 +1,26 @@
+#!/bin/sh
+
+set -e
+
+if [ -z "$CMAKE" ]; then
+	CMAKE=cmake
+fi
+
+if [ -z "$DESTDIR" ]; then
+	DESTDIR=/opt/vc
+fi
+
+ARCH=$(uname -m)
+FLAG64=""
+
+if [ "$ARCH" = "arm64" ]; then
+  FLAG64="-DARM64=ON"
+fi
+
+rm -Rf build
+mkdir -p build/arm-freebsd/release/
+cd build/arm-freebsd/release/
+$CMAKE VERBOSE=1 $FLAG64 -DARM64=ON -DCMAKE_TOOLCHAIN_FILE=../../../makefiles/cmake/toolchains/arm-freebsd.cmake -DCMAKE_BUILD_TYPE=Release ../../..
+make VERBOSE=1
+make DESTDIR=$DESTDIR install
+cd ../../../
